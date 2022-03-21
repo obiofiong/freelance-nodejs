@@ -14,14 +14,7 @@ app.use(express.static("public"));
 
 app.get("/", (req, res) => {
   // res.sendFile("./index.html", { root: __dirname });
-  const jobs = [
-    "Graphic Artist",
-    "Web Designer",
-    "Web Designer",
-    "Web Designer",
-    "Web Designer",
-    "Illustrator",
-  ];
+  const jobs = ["Graphic Artist", "Web Designer", "Illustrator"];
   works = [
     {
       img: "assets/img/portfolio/cabin.png",
@@ -59,8 +52,12 @@ app.post("/contact", (req, res) => {
   // res.json({})
   console.log("The request posted to contact", req.body);
   // JSON
-  // JSON.stringify()
+  // JSON.stringify() to convert to a string
   let result = JSON.stringify(req.body);
+  // JSON
+  console.log(result);
+  console.log(typeof result, typeof req.body);
+  console.log(result.name);
   let name = req.body.name;
   let date = new Date().toDateString();
   let path = "./contacts/" + name + "-" + date + ".txt";
