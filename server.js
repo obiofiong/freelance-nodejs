@@ -1,14 +1,14 @@
 const express = require("express");
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 const fs = require("fs");
 const mongoose = require("mongoose");
 const Contact = require("./models/contact.js");
+require("dotenv").config();
+// console.log(process.env);
 
-const uri =
-  "mongodb+srv://africaagility:africaagility@africaagilitydb.gycni.mongodb.net/africaagilitydb?retryWrites=true&w=majority";
 mongoose
-  .connect(uri)
+  .connect(process.env.URI)
   .then((res) => {
     console.log("database connected");
 
@@ -78,7 +78,6 @@ app.post("/contact", (req, res) => {
   let name = req.body.name;
   let date = new Date().toDateString();
   let path = "./contacts/" + name + "-" + date + ".txt";
-  const ContactM = new Contact();
   // validation
   if (!req.body.name) {
     res.render("contact", {
@@ -101,9 +100,10 @@ app.post("/contact", (req, res) => {
     message: req.body.message,
   };
   // save to database
+  const ContactM = new Contact();
   ContactM.save(payload)
     .then((result) => {
-      console.log("Contact saved");
+      console.log("Contact saved", result);
       res.render("contact", {
         error: false,
         success: "Successfully Posted contact",
