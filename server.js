@@ -100,8 +100,9 @@ app.post("/contact", (req, res) => {
     message: req.body.message,
   };
   // save to database
-  const ContactM = new Contact();
-  ContactM.save(payload)
+  const contact = new Contact(payload);
+  contact
+    .save()
     .then((result) => {
       console.log("Contact saved", result);
       res.render("contact", {
