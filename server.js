@@ -2,6 +2,23 @@ const express = require("express");
 const app = express();
 const PORT = 4000;
 const fs = require("fs");
+const mongoose = require("mongoose");
+const Contact = require("./models/contact.js");
+
+const uri =
+  "mongodb+srv://africaagility:africaagility@africaagilitydb.gycni.mongodb.net/africaagilitydb?retryWrites=true&w=majority";
+mongoose
+  .connect(uri)
+  .then((res) => {
+    console.log("database connected");
+
+    app.listen(PORT, () => {
+      console.log("listening on port", PORT);
+    });
+  })
+  .catch((err) => {
+    console.log("error connecting", err);
+  });
 
 const bodyParser = require("body-parser");
 
@@ -61,7 +78,8 @@ app.post("/contact", (req, res) => {
   let name = req.body.name;
   let date = new Date().toDateString();
   let path = "./contacts/" + name + "-" + date + ".txt";
-
+  const ContactM = new Contact();
+  // validation
   if (!req.body.name) {
     res.render("contact", {
       error: "Name is required",
@@ -75,30 +93,52 @@ app.post("/contact", (req, res) => {
       values: req.body,
     });
   }
-  fs.writeFile(path, result, (err) => {
-    if (err) {
+
+  const payload = {
+    fullname: req.body.name,
+    email: req.body.email,
+    phone: req.body.phone,
+    message: req.body.message,
+  };
+  // save to database
+  ContactM.save(payload)
+    .then((result) => {
+      console.log("Contact saved");
+      res.render("contact", {
+        error: false,
+        success: "Successfully Posted contact",
+        values: {},
+      });
+    })
+    .catch((err) => {
       console.log(err);
       res.render("contact", {
         error: "err:" + err,
         success: false,
         values: {},
       });
-    } else {
-      console.log("success");
-      res.render("contact", {
-        error: false,
-        success: "Successfully Posted contact",
-        values: {},
-      });
-    }
-  });
+    });
+
+  // fs.writeFile(path, result, (err) => {
+  //   if (err) {
+  //     console.log(err);
+  //     res.render("contact", {
+  //       error: "err:" + err,
+  //       success: false,
+  //       values: {},
+  //     });
+  //   } else {
+  //     console.log("success");
+  //     res.render("contact", {
+  //       error: false,
+  //       success: "Successfully Posted contact",
+  //       values: {},
+  //     });
+  //   }
+  // });
   // fs.writeFile()
   // res.send("request sent");
 });
 app.post("/about", (req, res) => {
   console.log("The request posted to about", req.body);
-});
-
-app.listen(PORT, () => {
-  console.log("listening on port", PORT);
 });
